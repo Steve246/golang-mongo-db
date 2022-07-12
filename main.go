@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -64,29 +64,47 @@ func main() {
 	//insert One to Many
 
 	
-	docs := []interface{}{
-		bson.D{
-		{"name", "Oscar"},
-		{"age", 20},
-		{"gender", "F"},
-		{"senior", true},
-		},
-		bson.D{
-			{"name", "Tano"},
-			{"age", 22},
-			{"gender", "M"},
-			{"senior", false},
-			},
-	}
+	// docs := []interface{}{
+	// 	bson.D{
+	// 	{"name", "Oscar"},
+	// 	{"age", 20},
+	// 	{"gender", "F"},
+	// 	{"senior", true},
+	// 	},
+	// 	bson.D{
+	// 		{"name", "Tano"},
+	// 		{"age", 22},
+	// 		{"gender", "M"},
+	// 		{"senior", false},
+	// 		},
+	// }
 
-	result, err := coll.InsertMany(ctx, docs)
 
+	// result, err := coll.InsertMany(ctx, docs)
+
+
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+
+	// fmt.Printf("inserted document with Id %v\n", result.InsertedIDs)
+
+
+	//Update
+
+	id, _ := primitive.ObjectIDFromHex("62ccfe93ce3364748672cc44")
+
+	filter := bson.D{{"_id", id}}
+
+	update := bson.D{{"$set", bson.D{{"rating_dev", 4.0}}}}
+
+	result, err := coll.UpdateOne(ctx, filter, update)
 
 	if err != nil {
-		log.Println(err.Error())
+		panic(err)
 	}
 
-	fmt.Printf("inserted document with Id %v\n", result.InsertedIDs)
+	fmt.Print("update document with Id", result)
 
 }
 
