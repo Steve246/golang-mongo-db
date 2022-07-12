@@ -97,7 +97,7 @@ func main() {
 
 	
 	
-	docs := []interface{}{
+	students := []interface{}{
 		bson.D{
 		{"name", "Melati"},
 		{"age", 29},
@@ -114,7 +114,7 @@ func main() {
 			},
 	}
 
-	result, err := coll.InsertMany(ctx, docs)
+	result, err := coll.InsertMany(ctx, students)
 
 
 	if err != nil {
