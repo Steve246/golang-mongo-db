@@ -19,11 +19,58 @@ type ProductController struct {
 
 	DeleteProdukUsecase usecase.DeleteUseCase
 
+	FindByIdUsecase usecase.GetByIdUseCase
+
+	FindByCategoryUsecase usecase.GetByCategoryUseCase
+
+
+
 }
+
+func (pc *ProductController) FindCategory(ctx *gin.Context) {
+	categoryProduct := ctx.Param("categoryProduct")
+
+	product, err := pc.FindByCategoryUsecase.FindByCategory(categoryProduct)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "Id exists") {
+			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": product})
+
+
+}
+
+func (pc *ProductController) FindPostById(ctx *gin.Context) {
+	productID := ctx.Param("postId")
+
+	// productID := "62cda38af994b6a69b95bf7c"
+	//jalan kalau dikasih id manual
+
+	post, err := pc.FindByIdUsecase.FindById(productID)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "Id exists") {
+			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": post})
+}
+
 
 func (pc *ProductController) DeleteProduct (ctx *gin.Context) {
 	productId := ctx.Param("postID")
 	// productId := "62cd8c761988bbb77e85e3c5"
+	//jalan kalau dikasih ide manual
 	err := pc.DeleteProdukUsecase.Delete(productId)
 
 	if err != nil {
@@ -40,9 +87,9 @@ func (pc *ProductController) DeleteProduct (ctx *gin.Context) {
 }
 
 func (pc *ProductController) UpdateProduct(ctx *gin.Context) {
-	productID := ctx.Param("postID")
+	// productID := ctx.Param("postID")
 
-	// produkId := "62cd8c761988bbb77e85e3c5"
+	productID := "62cd8c6d1988bbb77e85e3c4"
 
 	var produk *model.Product
 
@@ -119,22 +166,28 @@ func (pc *ProductController) registerNewProduct(ctx *gin.Context) {
 
 
 func NewProductController(router *gin.Engine, productUseCase usecase.ProductRegistrationUseCase, FindlimitUsecase usecase.PaginationUseCase, UpdateProdukUsecase usecase.UpdateProductUsecase, 
-	DeleteProdukUsecase usecase.DeleteUseCase) *ProductController {
+	DeleteProdukUsecase usecase.DeleteUseCase, 	FindByIdUsecase usecase.GetByIdUseCase,FindByCategoryUsecase usecase.GetByCategoryUseCase	) *ProductController {
 	controller := ProductController{
 		router: router,
 		productUseCase: productUseCase,
 		FindlimitUsecase: FindlimitUsecase,
 		UpdateProdukUsecase: UpdateProdukUsecase,
 		DeleteProdukUsecase: DeleteProdukUsecase,
+		FindByIdUsecase: FindByIdUsecase,
+		FindByCategoryUsecase: FindByCategoryUsecase,
 	}
 
 	router.POST("/product", controller.registerNewProduct)
 
 	router.GET("/productAll", controller.FindLimit)
 
-	router.PATCH("/productUpdate/:postID", controller.UpdateProduct)
+	router.PATCH("/productUpdate", controller.UpdateProduct)
 
 	router.DELETE("/productDelete/:postID", controller.DeleteProduct)
+
+	router.GET("/productGetID/:postID", controller.FindPostById)
+
+	router.GET("/productGetCategory/:categoryProduct", controller.FindCategory)
 
 
 	return &controller

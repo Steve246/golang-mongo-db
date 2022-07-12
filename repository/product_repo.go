@@ -16,13 +16,78 @@ type ProductRepository interface {
 	Retrieve() ([]model.Product, error)
 	Pagination(limitNumber *model.FindLimit)([]model.Product, error)
 
-	UpdateProduct(id string, updateProduct *model.Product) (*model.Product,error) //update masih blm jalan
+	UpdateProduct(id string, updateProduct *model.Product) (*model.Product,error) //update masih blm jalan, tanpa id pun
 
 	DeleteProduct(id string) error
+
+	GetById(id string) (*model.Product, error)
+
+	GetByCategory(category string) ([]model.Product, error)
 }
 
 type productRepository struct {
 	db *mongo.Database
+}
+
+func (p *productRepository) GetByCategory(category string) ([]model.Product, error){
+	
+
+	//
+	var products []model.Product
+
+	ctx, cancel := utils.InitContext()
+	defer cancel() 
+
+	filter := bson.M{"category": category}
+
+	numerLimiter := 5
+	
+	opts := options.Find().SetLimit(int64(numerLimiter))
+
+	cursor, err := p.db.Collection("products").Find(ctx, filter, opts)
+
+	if err != nil {
+		return nil, err 
+	}
+
+	for cursor.Next(ctx) {
+		var product model.Product
+
+		err = cursor.Decode(&product)
+
+		if err != nil {
+			return nil, err 
+		}
+		products = append(products, product)
+	}
+
+	return products, nil 
+
+}
+
+func (p *productRepository) GetById(id string) (*model.Product, error) {
+
+	ctx, cancel := utils.InitContext()
+	defer cancel()
+
+
+
+	obId, _ := primitive.ObjectIDFromHex(id)
+
+	query := bson.M{"_id": obId}
+
+	var product *model.Product
+
+	if err := p.db.Collection("products").FindOne(ctx, query).Decode(&product); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.New("no document with that Id exists")
+		}
+
+		return nil, err
+	}
+
+	return product, nil
+
 }
 
 func (p *productRepository) DeleteProduct(id string) error {
@@ -51,9 +116,14 @@ func (p *productRepository) UpdateProduct(id string, updateProduct *model.Produc
 	ctx, cancel := utils.InitContext()
 	defer cancel()
 
+	doc, err := utils.ToDoc(updateProduct)
+	if err != nil {
+		return nil, err
+	}
+
 	obId, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.D{{"_id", obId}}
-	update := bson.D{{"$set", updateProduct}}
+	update := bson.D{{"$set", doc}}
 
 	// result, err := p.db.Collection("product").UpdateOne(ctx, filter, update)
 
@@ -66,18 +136,6 @@ func (p *productRepository) UpdateProduct(id string, updateProduct *model.Produc
 	}
 
 	return updatedPost, nil 
-
-	
-
-	// res := p.postCollection.FindOneAndUpdate(p.ctx, query, update, options.FindOneAndUpdate().SetReturnDocument(1))
-
-	// var updatedPost *models.DBPost
-
-	// if err := res.Decode(&updatedPost); err != nil {
-	// 	return nil, errors.New("no post with that Id exists")
-	// }
-
-	// return updatedPost, nil
 
 
 }

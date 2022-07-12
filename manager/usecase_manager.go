@@ -12,12 +12,29 @@ type UseCaseManager interface {
 	//delete produk
 	DeleteProductUsecase() usecase.DeleteUseCase
 
+	//getById
+
+	GetByIdUseCase() usecase.GetByIdUseCase
+
+	//Getbycategory 
+
+	GetByCategoryUsecase() usecase.GetByCategoryUseCase
+
 
 }
 
 type useCaseManager struct {
 	repoManager RepositoryManager
 }
+
+func (u useCaseManager) GetByCategoryUsecase() usecase.GetByCategoryUseCase {
+	return usecase.NewCategoryUseCase(u.repoManager.ProductRepo())
+}
+
+func (u useCaseManager) GetByIdUseCase() usecase.GetByIdUseCase {
+	return usecase.NewGetByIdUseCase(u.repoManager.ProductRepo())
+}
+
 
 func (u useCaseManager) DeleteProductUsecase() usecase.DeleteUseCase {
 	return usecase.NewDeleteUseCase(u.repoManager.ProductRepo())
