@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -139,24 +139,57 @@ func main() {
 
 	//pake struct 
 
-	newStudent := Student{
-	Id: primitive.NewObjectID(), 
-	Name: "Steve" ,
-	Age: 23,
-	Gender: "M",
-	// JoinDate: parseTime("2022-07-13 15:04:03"),
-	JoinDate: primitive.NewDateTimeFromTime(parseTime("2022-07-13 00:00:00")),
-	Senior: false,
-	}
+	// newStudent := Student{
+	// Id: primitive.NewObjectID(), 
+	// Name: "Steve" ,
+	// Age: 23,
+	// Gender: "M",
+	// // JoinDate: parseTime("2022-07-13 15:04:03"),
+	// JoinDate: primitive.NewDateTimeFromTime(parseTime("2022-07-13 00:00:00")),
+	// Senior: false,
+	// }
 
-	newId, err := coll.InsertOne(ctx, newStudent)
+	// newId, err := coll.InsertOne(ctx, newStudent)
 
 
-	if err != nil {
-		log.Println(err.Error())
-	}
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
 
-	fmt.Printf("inserted document with Id %v\n", newId.InsertedID)
+	// fmt.Printf("inserted document with Id %v\n", newId.InsertedID)
+
+	//update
+
+	filterId, _ := primitive.ObjectIDFromHex("62ccfe1d8412e9e781a34716")
+
+	// filterData := bson.D{{"_id", "62ccfe1d8412e9e781a34716"}}
+
+	updateData := bson.D{{
+		"$set", bson.D{{
+			Key: "senior", Value: true,
+		}},
+	}}
+
+	// result, err := coll.UpdateOne(ctx, filterId, updateData)
+	result, _ := coll.UpdateOne(ctx, bson.M{"_id": filterId}, updateData)
+
+	fmt.Printf("Documents updated: %v\n", result.MatchedCount)
+
+
+
+	//delete
+
+	// deleteData := bson.M{
+	// 	"name": "Amberr",
+	// }
+
+	// result, err := coll.DeleteOne(ctx, deleteData)
+
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+
+	// fmt.Printf("DeleteOne removed %v document(s)\n", result.DeletedCount)
 
 
 }
