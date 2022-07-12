@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -24,6 +27,10 @@ func main() {
 
 	connect, err := mongo.Connect(context.Background(), clientsOptions)
 
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+
+	defer cancel()
+
 	if err != nil {
 		panic(err)
 	} else {
@@ -35,6 +42,51 @@ func main() {
 			panic(err)
 		}
 	}()
+
+	//membuat sebuah db - collection
+
+	db := connect.Database("enigma")
+	coll := db.Collection("student")
+
+	
+
+	// Create 
+
+	//insert One
+
+	// newId, err := coll.InsertOne(ctx, bson.D{
+	// 	{"name", "Jack"},
+	// 	{"age", 22},
+	// 	{"gender", "M"},
+	// 	{"senior", false},
+	// })
+
+	//insert One to Many
+
+	
+	docs := []interface{}{
+		bson.D{
+		{"name", "Oscar"},
+		{"age", 20},
+		{"gender", "F"},
+		{"senior", true},
+		},
+		bson.D{
+			{"name", "Tano"},
+			{"age", 22},
+			{"gender", "M"},
+			{"senior", false},
+			},
+	}
+
+	result, err := coll.InsertMany(ctx, docs)
+
+
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	fmt.Printf("inserted document with Id %v\n", result.InsertedIDs)
 
 }
 
