@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -14,9 +13,21 @@ import (
 
 const mongodbUri = "mongodb://127.0.0.1:27017"
 
+type Student struct {
+	Id primitive.ObjectID `bson:"_id"`
+	Name string 	`bson:"fullname"`
+	Age int  `bson:"age"`
+	Gender string  `bson:"gender"`
+	// JoinDate time.Time `bson:"joinDate"`
+
+	JoinDate primitive.DateTime `bson:"joinDate"`
+
+	Senior bool  `bson:"senior"`
+}
 func main() {
 
 	credential := options.Credential{
+		AuthMechanism: "SCRAM-SHA-256",
 		Username: "stevejo",
 		Password: "password",
 	}
@@ -91,41 +102,65 @@ func main() {
 
 	//pake time parse
 
-	jd01 := parseTime("2022-07-02 15:04:05")
-	jd02 := parseTime("2022-07-03 15:04:05")
+	// jd01 := parseTime("2022-07-02 15:04:05")
+	// jd02 := parseTime("2022-07-03 15:04:05")
 	// jd03 := parseTime("2022-07-04 15:04:05")
 
 	
 	
-	students := []interface{}{
-		bson.D{
-		{"name", "Melati"},
-		{"age", 29},
-		{"gender", "F"},
-		{"joinDate", primitive.NewDateTimeFromTime(jd01)},
-		{"senior", true},
-		},
-		bson.D{
-			{"name", "Anggar"},
-			{"age", 22},
-			{"gender", "M"},
-			{"joinDate", primitive.NewDateTimeFromTime(jd02)},
-			{"senior", false},
-			},
+	// students := []interface{}{
+	// 	bson.D{
+	// 	{"name", "Melati"},
+	// 	{"age", 29},
+	// 	{"gender", "F"},
+	// 	{"joinDate", primitive.NewDateTimeFromTime(jd01)},
+	// 	{"senior", true},
+	// 	},
+	// 	bson.D{
+	// 		{"name", "Anggar"},
+	// 		{"age", 22},
+	// 		{"gender", "M"},
+	// 		{"joinDate", primitive.NewDateTimeFromTime(jd02)},
+	// 		{"senior", false},
+	// 		},
+	// }
+
+	// result, err := coll.InsertMany(ctx, students)
+
+
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+
+	// fmt.Printf("inserted document with Id %v\n", result.InsertedIDs)
+
+	// fmt.Println(parseTime("2021-02-1"))
+
+
+	//pake struct 
+
+	newStudent := Student{
+	Id: primitive.NewObjectID(), 
+	Name: "Steve" ,
+	Age: 23,
+	Gender: "M",
+	// JoinDate: parseTime("2022-07-13 15:04:03"),
+	JoinDate: primitive.NewDateTimeFromTime(parseTime("2022-07-13 00:00:00")),
+	Senior: false,
 	}
 
-	result, err := coll.InsertMany(ctx, students)
+	newId, err := coll.InsertOne(ctx, newStudent)
 
 
 	if err != nil {
 		log.Println(err.Error())
 	}
 
-	fmt.Printf("inserted document with Id %v\n", result.InsertedIDs)
+	fmt.Printf("inserted document with Id %v\n", newId.InsertedID)
 
-	fmt.Println(parseTime("2021-02-1"))
 
 }
+
 
 func parseTime(date string) time.Time {
 	layoutFormat := "2006-01-02"
