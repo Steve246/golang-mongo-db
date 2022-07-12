@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -64,17 +65,51 @@ func main() {
 	//insert One to Many
 
 	
+	// docs := []interface{}{
+	// 	bson.D{
+	// 	{"name", "Oscar"},
+	// 	{"age", 20},
+	// 	{"gender", "F"},
+	// 	{"senior", true},
+	// 	},
+	// 	bson.D{
+	// 		{"name", "Tano"},
+	// 		{"age", 22},
+	// 		{"gender", "M"},
+	// 		{"senior", false},
+	// 		},
+	// }
+
+	// result, err := coll.InsertMany(ctx, docs)
+
+
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+
+	// fmt.Printf("inserted document with Id %v\n", result.InsertedIDs)
+
+	//pake time parse
+
+	jd01 := parseTime("2022-07-02 15:04:05")
+	jd02 := parseTime("2022-07-03 15:04:05")
+	// jd03 := parseTime("2022-07-04 15:04:05")
+
+	
+	
 	docs := []interface{}{
 		bson.D{
-		{"name", "Oscar"},
-		{"age", 20},
+		{"name", "Melati"},
+		{"age", 29},
 		{"gender", "F"},
+		{"joinDate", primitive.NewDateTimeFromTime(jd01)},
 		{"senior", true},
 		},
 		bson.D{
-			{"name", "Tano"},
+			{"name", "Anggar"},
 			{"age", 22},
 			{"gender", "M"},
+			{"joinDate", primitive.NewDateTimeFromTime(jd02)},
 			{"senior", false},
 			},
 	}
@@ -88,6 +123,14 @@ func main() {
 
 	fmt.Printf("inserted document with Id %v\n", result.InsertedIDs)
 
+	fmt.Println(parseTime("2021-02-1"))
+
+}
+
+func parseTime(date string) time.Time {
+	layoutFormat := "2006-01-02"
+	parse, _ := time.Parse(layoutFormat, date)
+	return parse
 }
 
 
