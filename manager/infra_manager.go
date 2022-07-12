@@ -39,7 +39,7 @@ func (i *infraManager) initDb() {
 	if err != nil {
 		panic(err)
 	}
-	client.Database(i.cfg.DbName)
+	i.db = client.Database(i.cfg.DbName)
 }
 
 func (i *infraManager) DbConn() *mongo.Database {
