@@ -25,7 +25,7 @@ func (i *infraManager) initDb() {
 		Password: i.cfg.Password,
 	}
 
-	mongoUri := fmt.Sprintf("mongodb://%s:%s", i.cfg.Host, i.cfg.ApiPort)
+	mongoUri := fmt.Sprintf("mongodb://%s:%s", i.cfg.Host, i.cfg.Port) //yang bikin salah karena penulisan i.cfg.Apiport
 
 	clientOptions := options.Client()
 	clientOptions.ApplyURI(mongoUri).SetAuth(credentials)
@@ -39,6 +39,7 @@ func (i *infraManager) initDb() {
 	if err != nil {
 		panic(err)
 	}
+	// i.db = client.Database(i.cfg.DbName)
 	i.db = client.Database(i.cfg.DbName)
 }
 
