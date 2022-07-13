@@ -118,6 +118,8 @@ func (pc *ProductController) UpdateProduct(ctx *gin.Context) {
 func (pc *ProductController) FindLimit(ctx *gin.Context) {
 	//bikin model baru buat ambil nilai int
 
+	//nambain page juga sama limit
+
 	var newLimit model.FindLimit
 
 	err := ctx.ShouldBindJSON(&newLimit)
@@ -176,6 +178,8 @@ func NewProductController(router *gin.Engine, productUseCase usecase.ProductRegi
 		FindByIdUsecase: FindByIdUsecase,
 		FindByCategoryUsecase: FindByCategoryUsecase,
 	}
+
+	//GET di param querry, POST baru pake body
 
 	router.POST("/product", controller.registerNewProduct)
 
