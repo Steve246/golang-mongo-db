@@ -122,8 +122,8 @@ func (p *productRepository) UpdateProduct(id string, updateProduct *model.Produc
 	}
 
 	obId, _ := primitive.ObjectIDFromHex(id)
-	filter := bson.D{{"_id", obId}}
-	update := bson.D{{"$set", doc}}
+	filter := bson.D{{Key:"_id", Value: obId}}
+	update := bson.D{{Key:"$set", Value:doc}}
 
 	// result, err := p.db.Collection("product").UpdateOne(ctx, filter, update)
 
